@@ -1,64 +1,44 @@
+var REFRESH_TIMER_INTERVAL = 250;
+
+var PASS_TEXT = 'You got the count correct!<br>Here is your magic number:<br>';
+var FAIL_WRONG_TEXT = 'Sorry, the correct count was: ';
+var FAIL_ANSWERED_TEXT = 'You already submitted an answer for this deck.<br>Click the cards to begin a new deck.';
+var FAIL_SEE_ALL_CARDS_TEXT = 'You got the count right without looking at all the cards?<br>Nice guessing, but try again.';
+var FAIL_TIME_TEXT = 'You got the count right, but you need to be faster.<br>Be sure to submit your answer before the timer runs out.';
+
 var socket = io();
+var state = {};
 
-var deadline = null;
-var timer = null;
-
-socket.on('init', (data) => {
-	deadline = data.deadline;
-	startTimer();
-});
-
-socket.on('card', (data) => {
-	document.getElementById('card').src = cardObjToSvgName(data.card);
+socket.on('cards', (data) => {
+	state.cards = data.cards;
+	state.deadline = data.deadline;
+	state.timer = setInterval(() => {
+		var time_remaining = Math.floor((state.deadline - Date.now()) / 1000);
+		if (time_remaining < 0) {
+			document.getElementById('timer').innerHTML = "Time's up.";
+			document.getElementById('timer').style.color = "#FF0000";
+		} else {
+			document.getElementById('timer').innerHTML = "Time remaining: " + time_remaining;
+			document.getElementById('timer').style.color = "#000000";
+		}
+	}, REFRESH_TIMER_INTERVAL);
+	nextCard();
 })
 
-socket.on('pass', (data) => {
-	document.getElementById('timer').innerHTML = 'You got the count correct!';
-	document.getElementById('magicnumber').innerHTML = '<br>Here is your magic number:<br>' + data.code;
-	resetClient();
-});
+socket.on('pass', (data) => resetClient(PASS_TEXT + data.code));
+socket.on('fail_wrong', (data) => resetClient(FAIL_WRONG_TEXT + data.correct));
+socket.on('fail_answered', (data) => resetClient(FAIL_ANSWERED_TEXT));
+socket.on('fail_see_all_cards', (data) => resetClient(FAIL_SEE_ALL_CARDS_TEXT));
+socket.on('fail_time', (data) => resetClient(FAIL_TIME_TEXT));
 
-socket.on('fail_answered', (data) => {
-	document.getElementById('timer').innerHTML = (
-		'You already submitted an answer for this deck.<br>' +
-		'Click the cards to begin a new deck.'
-	);
-	resetClient();
-});
-
-socket.on('fail_wrong', (data) => {
-	document.getElementById('timer').innerHTML = 'Sorry, the correct count was ' + data.correct + '.';
-	resetClient();
-});
-
-socket.on('fail_see_all_cards', (data) => {
-	document.getElementById('timer').innerHTML = (
-		'You got the count right without looking at all the cards?<br>' +
-		'Nice guessing, but try again.'
-	);
-	resetClient();
-})
-
-socket.on('fail_time', (data) => {
-	document.getElementById('timer').innerHTML = (
-		'You got the count right, but you need to be faster.<br>' +
-		'Be sure to submit your answer before the timer runs out.'
-	);
-	resetClient();
-})
-
-function resetClient() {
-	deadline = null;
-	clearInterval(timer);
+function resetClient(timerText) {
+	if (state.timer) {
+		clearInterval(state.timer);
+	}
+	state = {};
 	document.getElementById('card').src = 'cards/BLUE_BACK.svg';
 	document.getElementById('count').value = '';
-};
-
-window.onload = function() {
-	document.getElementById('card').addEventListener('click', nextCard);
-	document.getElementById('submit').addEventListener('click', sendAnswer);
-	document.getElementById('count').value = '';
-	socket.emit('reset');
+	document.getElementById('timer').innerHTML = timerText;
 };
 
 function cardObjToSvgName(cardObj) {
@@ -69,29 +49,21 @@ function cardObjToSvgName(cardObj) {
 }
 
 function nextCard() {
-	socket.emit('request_card');
-	console.log('req');
+	if (!state.cards) {
+		socket.emit('request_cards');
+		return;
+	}
+	if (state.cards.length === 0) {
+		socket.emit('saw_all_cards');
+		return;
+	}
+	var card = state.cards.pop();
+	document.getElementById('card').src = cardObjToSvgName(card);
 }
 
 function sendAnswer() {
 	socket.emit('answer', {count: document.getElementById('count').value});
 	document.getElementById('timer').style.color = "#000000";
-}
-
-function startTimer() {
-	if (deadline === null) {
-		return;
-	}
-	timer = setInterval(() => {
-		var time_remaining = Math.floor((deadline - Date.now()) / 1000);
-		if (time_remaining < 0) {
-			document.getElementById('timer').innerHTML = "Time's up.";
-			document.getElementById('timer').style.color = "#FF0000";
-		} else {
-			document.getElementById('timer').innerHTML = "Time remaining: " + time_remaining;
-			document.getElementById('timer').style.color = "#000000";
-		}
-	}, 250);
 }
 
 document.onkeydown = function(e) {
@@ -107,3 +79,11 @@ document.onkeydown = function(e) {
 			break;
 	}
 }
+
+function init() {
+	document.getElementById('card').addEventListener('click', nextCard);
+	document.getElementById('submit').addEventListener('click', sendAnswer);
+	document.getElementById('count').value = '';
+	resetClient('Time remaining: ');
+};
+init();

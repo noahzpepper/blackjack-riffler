@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Riffling Test</title>
+	<meta charset="utf-8">
+	<meta http-equiv="Cache-control" content="no-cache">
+
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+	
+    <script src="/socket.io/socket.io.js"></script>
+	<script src="client.js"></script>
+
+</head>
+
+<body>
+
+	<div id="main" style="max-width: 912px;">
+		<span style="display: block">
+			<h1>Blackjack Riffling Test</h1>
+			<div id="instructions">
+				<p>Click or press spacebar to view the next card.</p>
+				<p>Then, submit your answer for the count of the deck before the timer expires.</p>
+			</div>
+			<div id="card_container">
+				<!-- <img class="card_bottom" src="cards/BLUE_BACK.svg"> -->
+				<img class="card" id="card" src="cards/BLUE_BACK.svg">
+			</div>
+            <div id="count_submitter">
+                <label for="count">Count:</label>
+                <input type="text" id="count" name="count"><br><br>
+                <input type="submit" id="submit" value="Submit">
+			</div>
+			<div id="timer_div">
+				<label id="timer">Time remaining: </label>
+				<label id="magicnumber"></label>
+			</div>
+		</span>
+	</div>
+
+</body>
+
+</html>

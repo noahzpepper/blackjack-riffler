@@ -1,0 +1,19 @@
+{
+  "name": "blackjack-riffler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "clean": "rm -rf node_modules",
+    "reinstall": "npm run clean && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "noahzpepper@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "reinstall": "^2.0.0",
+    "seededshuffle": "^0.2.0",
+    "socket.io": "^2.3.0"
+  }
+}

@@ -12,9 +12,10 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true})); 
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var port = process.env.PORT || 3000;
 
 // Create server
-server.listen(3000, () => console.log('server is running on port', server.address().port));
+server.listen(port, () => console.log('server is running on port', server.address().port));
 
 // Server variables
 var seed = -1;

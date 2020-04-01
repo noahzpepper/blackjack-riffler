@@ -54,8 +54,13 @@ function resetClient() {
 		card_container.removeChild(card_container.firstChild);
 	}
 	var img = cache['cards/BLUE_BACK.svg'].cloneNode(true);
-	img.classList.add('card');
-	img.classList.remove('ghost-card');
+	img.classList.add('left-card');
+	img.classList.remove('right-card');
+	card_container.appendChild(img);
+
+	var img = cache['cards/EMPTY.svg'].cloneNode(true);
+	img.classList.add('right-card-initial');
+	img.classList.remove('left-card');
 	card_container.appendChild(img);
 
 	// Reset html
@@ -97,7 +102,7 @@ function nextCard() {
 	var card_container = document.getElementById('card_container');
 	var children = card_container.getElementsByTagName('*');
 	for (var i = 0; i < children.length; i++) {
-		children[i].classList.add('ghost-card');
+		children[i].classList.add('right-card');
 	}
 	card_container.appendChild(img);
 }
@@ -110,6 +115,9 @@ function sendAnswer() {
 }
 
 document.onkeydown = function(e) {
+	if (e.repeat) {
+		return;
+	}
 	e = e || window.event;
 	switch (e.keyCode) {
 		case 32: //SPACEBAR
@@ -149,7 +157,7 @@ function init() {
 		var img = new Image();
 		img.onload = loadSvg;
 		img.src = svgs[i];
-		img.classList.add('card');
+		img.classList.add('left-card');
 		cache[svgs[i]] = img;
 	}
 };

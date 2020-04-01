@@ -20,14 +20,21 @@ body > div#main > span > div#card_container {
 	margin-bottom: 20px;
 }
 
-.card {
+.left-card {
 	position: absolute;
 	left: 0%;
 }
 
-.ghost-card {
+.right-card {
 	left: 100%;
 	z-index: 1;
 	transition: all 0.1s linear;
+	transform: translate(-100%, 0%);
+}
+
+.right-card-initial {
+	position: absolute;
+	left: 100%;
+	z-index: -1;
 	transform: translate(-100%, 0%);
 }

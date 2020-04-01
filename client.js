@@ -50,6 +50,9 @@ function resetClient(timerText) {
 	// Reset html
 	document.getElementById('count').value = '';
 	document.getElementById('timer').innerHTML = timerText;
+
+	// Have server reset my socket data
+	socket.emit('reset');
 };
 
 function cardObjToSvgName(cardObj) {
@@ -69,7 +72,8 @@ function nextCard() {
 		return;
 	}
 	var card = state.cards.pop();
-	document.getElementById('card_container').appendChild(cache[cardObjToSvgName(card)]);
+	var img = cache[cardObjToSvgName(card)].cloneNode(true);
+	document.getElementById('card_container').appendChild(img);
 }
 
 function sendAnswer() {

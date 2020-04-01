@@ -40,15 +40,18 @@ function disconnect_user(id) {
 io.on('connection', function(socket) {
 
     socket.on('disconnect', (data) => disconnect_user(socket.id));
+    socket.on('reset', (data) => disconnect_user(socket.id));
 
     socket.on('saw_all_cards', (data) => {
         state[socket.id].saw_all_cards = true;
     });
 
     socket.on('request_cards', (data) => {
-        connect_user(socket.id);
-        io.to(socket.id).emit('cards', {deadline: state[socket.id].deadline, cards: state[socket.id].cards});
-    })
+        if (!(socket.id in state)) {
+            connect_user(socket.id);
+            io.to(socket.id).emit('cards', {deadline: state[socket.id].deadline, cards: state[socket.id].cards});
+        }
+    });
 
     socket.on('answer', function(data) {
 

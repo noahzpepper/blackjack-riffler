@@ -2,7 +2,7 @@
 <html>
 <head>
 
-	<title>Riffling Test</title>
+	<title>Blackjack Riffling Test</title>
 	<meta charset="utf-8">
 	<meta http-equiv="Cache-control" content="no-cache">
 
@@ -16,23 +16,21 @@
 
 <body>
 
-	<div id="main" style="max-width: 912px;">
+	<div id="main">
 		<span style="display: block">
 			<h1>Blackjack Riffling Test</h1>
-			<div id="instructions">
+			<div id="header_texts">
 				<p>Click or press spacebar to view the next card.</p>
 				<p>Then, submit your answer for the count of the deck before the timer expires.</p>
+                <label for="count">Count:</label>
+                <input type="text" id="count" name="count"><br>
+				<input type="submit" id="submit" value="Submit"><br><br>
+				<label id="info_text">Loading assets, please wait...</label><br>
+				<input type="submit" id="reset" style="visibility: hidden;" value="New Deck">
+
 			</div>
 			<div id="card_container">
 				<!-- Filled with cards. -->
-			</div>
-            <div id="count_submitter">
-                <label for="count">Count:</label>
-                <input type="text" id="count" name="count"><br><br>
-                <input type="submit" id="submit" value="Submit">
-			</div>
-			<div id="timer_div">
-				<label id="timer">Loading assets, please wait...</label>
 			</div>
 		</span>
 	</div>

@@ -33,7 +33,7 @@ function connect_user(id) {
 }
 
 function disconnect_user(id) {
-    delete state.id;
+    delete state[id];
 }
 
 // Server logic
@@ -54,6 +54,11 @@ io.on('connection', function(socket) {
     });
 
     socket.on('answer', function(data) {
+
+        if (!state[socket.id]) {
+            io.to(socket.id).emit('not_started');
+            return;
+        }
 
         var correct_count = String(count_cards(state[socket.id].cards));
         var guessed_count = String(data.count);

@@ -8,6 +8,7 @@ var FAIL_TIME_TEXT = 'You got the count right, but you need to be faster.<br>Be 
 
 var socket = io();
 var state = {};
+var cache = {};
 
 socket.on('cards', (data) => {
 	state.cards = data.cards;
@@ -32,11 +33,21 @@ socket.on('fail_see_all_cards', (data) => resetClient(FAIL_SEE_ALL_CARDS_TEXT));
 socket.on('fail_time', (data) => resetClient(FAIL_TIME_TEXT));
 
 function resetClient(timerText) {
+	
+	// Clear state
 	if (state.timer) {
 		clearInterval(state.timer);
 	}
 	state = {};
-	document.getElementById('card').src = 'cards/BLUE_BACK.svg';
+
+	// Reset cards
+	var card_container = document.getElementById('card_container');
+	while (card_container.firstChild) {
+		card_container.removeChild(card_container.firstChild);
+	}
+	card_container.appendChild(cache['cards/BLUE_BACK.svg']);
+
+	// Reset html
 	document.getElementById('count').value = '';
 	document.getElementById('timer').innerHTML = timerText;
 };
@@ -58,7 +69,7 @@ function nextCard() {
 		return;
 	}
 	var card = state.cards.pop();
-	document.getElementById('card').src = cardObjToSvgName(card);
+	document.getElementById('card_container').appendChild(cache[cardObjToSvgName(card)]);
 }
 
 function sendAnswer() {
@@ -80,10 +91,36 @@ document.onkeydown = function(e) {
 	}
 }
 
+/* Initial loading, cache all SVGs in cache */
+
+var counter = 0;
+function loadSvg() {
+	if (counter++ >= 52) {
+		doneLoadingSvgs();
+	}
+}
+
+function doneLoadingSvgs() {
+	resetClient('Time remaining: ');
+	document.getElementById('card_container').appendChild(cache['cards/BLUE_BACK.svg']);
+}
+
 function init() {
-	document.getElementById('card').addEventListener('click', nextCard);
+	document.getElementById('card_container').addEventListener('click', nextCard);
 	document.getElementById('submit').addEventListener('click', sendAnswer);
 	document.getElementById('count').value = '';
-	resetClient('Time remaining: ');
+    var svgs = [];
+	['C', 'D', 'H', 'S'].forEach(function(suit) {
+		['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'].forEach(function(rank) {
+			svgs.push(cardObjToSvgName({suit: suit, rank: rank}));
+		});
+	});
+	svgs.push('cards/BLUE_BACK.svg');
+	for (var i = 0; i < svgs.length; i++) {
+		var img = new Image();
+		img.onload = loadSvg;
+		img.src = svgs[i];
+		cache[svgs[i]] = img;
+	}
 };
 init();

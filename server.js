@@ -1,5 +1,5 @@
 const TIME_FOR_TEST = 45000;
-const NUM_CARDS = 5;
+const NUM_CARDS = 52;
 const NUM_DECKS = 6;
 const USE_FIXED_SEED = false;
 const FIXED_SEED_VALUE = 0;

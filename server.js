@@ -81,7 +81,29 @@ io.on('connection', function(socket) {
     })
 });
 
+app.get('/verify', function(req, res) {
+    if (req && req.query && req.query.id) {
+        var magic_number = req.query.id;
+        var verification = verify_magic_number(magic_number);
+        var status = verification ? "PASS" : "FAIL";
+        res.status(200).send('Magic number: ' + magic_number + '<br>Status: ' + status);
+    } else {
+        res.status(400).send('Invalid magic number.');
+    }
+
+});
+
 /**** Actual counting logic ****/
+
+function verify_magic_number(magic_number) {
+    var mn_split = magic_number.toString().split(".");
+    if (mn_split.length !== 2) { return false; }
+    var guess = mn_split[0];
+    var seed = "." + mn_split[1];
+    var cards = generate_cards(seed);
+    var answer = count_cards(cards).toString();
+    return answer === guess;
+}
 
 function count_cards(cards) {
     var count = 0; 
